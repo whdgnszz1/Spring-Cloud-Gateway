@@ -19,14 +19,15 @@ spring:
           predicates:
             - Path=/first-service/**
           filters:
-#            - AddRequestHeader=first-request, first-request-header
-#            - AddResponseHeader=first-response, first-response-header
-            - CustomFilter
+            - name: CustomFilter
         - id: second-service
           uri: http://localhost:8082/
           predicates:
             - Path=/second-service/**
           filters:
-#            - AddRequestHeader=second-request, second-request-header
-#            - AddResponseHeader=second-response, second-response-header
-            - CustomFilter
+            - name: CustomFilter
+            - name: GlobalFilter
+              args:
+                baseMessage: "Second service route"
+                preLogger: true
+                postLogger: true
