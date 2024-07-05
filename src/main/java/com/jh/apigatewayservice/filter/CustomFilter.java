@@ -53,12 +53,16 @@ public class CustomFilter extends AbstractGatewayFilterFactory<CustomFilter.Conf
                         .getBody();
 
                 log.info("JWT Claims: ");
+                ServerHttpRequest.Builder mutatedRequest = request.mutate();
                 for (Map.Entry<String, Object> entry : claims.entrySet()) {
-                    log.info("{}: {}", entry.getKey(), entry.getValue());
-                    request = exchange.getRequest().mutate()
-                            .header("X-Claim-" + entry.getKey(), entry.getValue().toString())
-                            .build();
+                    String claimKey = "X-Claim-" + entry.getKey();
+                    String claimValue = String.valueOf(entry.getValue());
+                    mutatedRequest.header(claimKey, claimValue);
+                    log.info("{}: {}", claimKey, claimValue);
                 }
+
+                request = mutatedRequest.build();
+                exchange = exchange.mutate().request(request).build();
 
             } catch (Exception e) {
                 log.error("JWT validation failed", e);
@@ -69,7 +73,7 @@ public class CustomFilter extends AbstractGatewayFilterFactory<CustomFilter.Conf
             log.info("Custom PRE filter: request uri -> {}", request.getURI());
             log.info("Custom PRE filter: request id -> {}", request.getId());
 
-            return chain.filter(exchange.mutate().request(request).build()).then(Mono.fromRunnable(() -> {
+            return chain.filter(exchange).then(Mono.fromRunnable(() -> {
                 log.info("Custom POST filter: response status code -> {}", response.getStatusCode());
             }));
         };
