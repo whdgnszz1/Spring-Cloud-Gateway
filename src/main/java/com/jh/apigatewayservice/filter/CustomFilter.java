@@ -55,6 +55,9 @@ public class CustomFilter extends AbstractGatewayFilterFactory<CustomFilter.Conf
                 log.info("JWT Claims: ");
                 for (Map.Entry<String, Object> entry : claims.entrySet()) {
                     log.info("{}: {}", entry.getKey(), entry.getValue());
+                    request = exchange.getRequest().mutate()
+                            .header("X-Claim-" + entry.getKey(), entry.getValue().toString())
+                            .build();
                 }
 
             } catch (Exception e) {
@@ -66,7 +69,7 @@ public class CustomFilter extends AbstractGatewayFilterFactory<CustomFilter.Conf
             log.info("Custom PRE filter: request uri -> {}", request.getURI());
             log.info("Custom PRE filter: request id -> {}", request.getId());
 
-            return chain.filter(exchange).then(Mono.fromRunnable(() -> {
+            return chain.filter(exchange.mutate().request(request).build()).then(Mono.fromRunnable(() -> {
                 log.info("Custom POST filter: response status code -> {}", response.getStatusCode());
             }));
         };
