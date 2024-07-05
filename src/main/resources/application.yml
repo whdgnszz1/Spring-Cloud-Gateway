@@ -26,11 +26,17 @@ spring:
             - Path=/second-service/**
           filters:
             - name: CustomFilter
-            - name: GlobalFilter
+            - name: LoggingFilter
               args:
-                baseMessage: "Second service route"
+                baseMessage: "Hi, there."
                 preLogger: true
                 postLogger: true
+      default-filters:
+        - name: GlobalFilter
+          args:
+            baseMessage: "Spring Cloud Gateway Global Filter"
+            preLogger: true
+            postLogger: true
 
 jwt:
   secret:
