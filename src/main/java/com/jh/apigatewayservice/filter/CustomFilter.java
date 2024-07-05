@@ -34,8 +34,7 @@ public class CustomFilter extends AbstractGatewayFilterFactory<CustomFilter.Conf
             ServerHttpResponse response = exchange.getResponse();
 
             if (!request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
-                response.setStatusCode(HttpStatus.UNAUTHORIZED);
-                return response.setComplete();
+                return chain.filter(exchange);
             }
 
             String authHeader = request.getHeaders().getOrEmpty(HttpHeaders.AUTHORIZATION).get(0);
